@@ -39,60 +39,30 @@ export class FlutterSeleniumBridge {
         }
     }
 
-    public async fillField(inputLocator: string, value: string): Promise<void> {
-        // Define a script to focus on the input, set the value, and dispatch events
-        const script = `
-            const inputLocator = arguments[0];
-            const value = arguments[1];
-            const inputElement = document.querySelector(inputLocator);
-            if (inputElement) {
+    public async activateInputField(locator: Locator, timeout: number = 30000): Promise<WebElement> {
+        let element = await this.driver.wait(until.elementLocated(locator), timeout);
+
+        // Mimic focus on a field
+        const mimicFocusOnAnInput = `
+            const element = arguments[0];
+            const textInput = element;//element.querySelector('input');
+            if (textInput) {
                 // Dispatch a focus event manually
                 const focusEvent = new FocusEvent('focus', {
                     bubbles: false, // Focus events do not bubble
                     cancelable: true
                 });
-                inputElement.dispatchEvent(focusEvent);
-    
-                // Set the value of the input element
-                inputElement.value = value;
-    
-                // Dispatch input event to ensure any bindings are updated
-                const inputEvent = new Event('input', { bubbles: true, cancelable: true });
-                inputElement.dispatchEvent(inputEvent);
-    
-                // Optionally, dispatch a change event if needed
-                const changeEvent = new Event('change', { bubbles: true });
-                inputElement.dispatchEvent(changeEvent);
-            } else {
-                throw new Error('Input element with locator ' + inputLocator + ' not found.');
+                textInput.dispatchEvent(focusEvent);
             }
         `;
-    
-        // Execute the script to focus, set the value, and dispatch events
-        await this.driver.executeScript(script, inputLocator, value);
-    
-        // Introduce a delay to allow events to propagate
-        await this.driver.sleep(100); // Adjust the delay as needed
-    }
 
-    public async waitForTextToBePresent(expectedText: string, timeout: number): Promise<void> {
-        let isTextPresent = false;
-        const startTime = Date.now();
-        const regex = new RegExp(expectedText.split(' ').join('[\\s\\S]*'), 'i'); // Create a regex that ignores whitespace and line breaks
+        // Execute the script to dispatch the focus event
+        await this.driver.executeScript(mimicFocusOnAnInput, element);
 
-        // Polling for the presence of text within the specified timeout
-        while (!isTextPresent && (Date.now() - startTime) < timeout) {
-            const pageSource = await this.driver.getPageSource();
-            if (regex.test(pageSource)) {
-                isTextPresent = true;
-            } else {
-                await this.driver.sleep(1000); // Wait for 1 second before checking again
-            }
-        }
+        // Introduce a delay
+        await this.driver.sleep(100);
 
-        if (!isTextPresent) {
-            throw new Error(`Text "${expectedText}" not found within ${timeout} milliseconds.`);
-        }
+        return element;
     }
 }
 
