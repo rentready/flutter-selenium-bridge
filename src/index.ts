@@ -39,69 +39,40 @@ export class FlutterSeleniumBridge {
         }
     }
 
-    public async fillField(selector: string, value: string): Promise<void> {
-        // Mimic focus on a field
-        const mimicFocusOnAnInput = `
-            const selector = arguments[0];
+    public async fillField(inputLocator: string, value: string): Promise<void> {
+        // Define a script to focus on the input, set the value, and dispatch events
+        const script = `
+            const inputLocator = arguments[0];
             const value = arguments[1];
-            const semanticNode = document.querySelector(selector);
-            if (semanticNode) {
-                const textInput = semanticNode.querySelector('input');
-                if (textInput) {
+            const inputElement = document.querySelector(inputLocator);
+            if (inputElement) {
                 // Dispatch a focus event manually
                 const focusEvent = new FocusEvent('focus', {
                     bubbles: false, // Focus events do not bubble
                     cancelable: true
                 });
-                textInput.dispatchEvent(focusEvent);
-                }
-            }
-            `;
-
-        // Execute the script to dispatch the focus event
-        await this.driver.executeScript(mimicFocusOnAnInput, selector, value);
-
-        // Introduce a delay
-        await this.driver.sleep(100); // Adjust the delay as needed
-
-        // Define a script to set the value and dispatch input and change events
-        const setValueScript = `
-            const selector = arguments[0];
-            const value = arguments[1];
-            const semanticNode = document.querySelector(selector);
-            if (semanticNode) {
-                const textInput = semanticNode.querySelector('input');
-                if (textInput) {
+                inputElement.dispatchEvent(focusEvent);
+    
                 // Set the value of the input element
-                textInput.value = value;
-
+                inputElement.value = value;
+    
                 // Dispatch input event to ensure any bindings are updated
                 const inputEvent = new Event('input', { bubbles: true, cancelable: true });
-                textInput.dispatchEvent(inputEvent);
-
+                inputElement.dispatchEvent(inputEvent);
+    
                 // Optionally, dispatch a change event if needed
                 const changeEvent = new Event('change', { bubbles: true });
-                textInput.dispatchEvent(changeEvent);
-                }
-            }
-            `;
-
-        // Execute the script to set the value and dispatch events
-        await this.driver.executeScript(setValueScript, selector, value);
-    }
-
-    public async clickElement(selector: string): Promise<void> {
-        // Execute the script to click the element
-        const script = `
-            const selector = arguments[0];
-            const element = document.querySelector(selector);
-            if (element) {
-                element.click();
+                inputElement.dispatchEvent(changeEvent);
             } else {
-                throw new Error('Element with selector ' + selector + ' not found.');
+                throw new Error('Input element with locator ' + inputLocator + ' not found.');
             }
-            `;
-        await this.driver.executeScript(script, selector);
+        `;
+    
+        // Execute the script to focus, set the value, and dispatch events
+        await this.driver.executeScript(script, inputLocator, value);
+    
+        // Introduce a delay to allow events to propagate
+        await this.driver.sleep(100); // Adjust the delay as needed
     }
 
     public async waitForTextToBePresent(expectedText: string, timeout: number): Promise<void> {
