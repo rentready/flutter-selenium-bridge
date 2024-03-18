@@ -57,6 +57,9 @@ export class FlutterSeleniumBridge {
         await this.driver.executeScript(mimicFocusOnAnInput, element);
 
         // Introduce a delay
+        await this.driver.sleep(500);
+
+        element.click();
         await this.driver.sleep(100);
 
         return element;
