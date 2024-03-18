@@ -44,16 +44,13 @@ export class FlutterSeleniumBridge {
 
         // Mimic focus on a field
         const mimicFocusOnAnInput = `
-            const element = arguments[0];
-            const textInput = element;//element.querySelector('input');
-            if (textInput) {
-                // Dispatch a focus event manually
-                const focusEvent = new FocusEvent('focus', {
-                    bubbles: false, // Focus events do not bubble
-                    cancelable: true
-                });
-                textInput.dispatchEvent(focusEvent);
-            }
+            const textInput = arguments[0];
+            // Dispatch a focus event manually
+            const focusEvent = new FocusEvent('focus', {
+                bubbles: false, // Focus events do not bubble
+                cancelable: true
+            });
+            textInput.dispatchEvent(focusEvent);
         `;
 
         // Execute the script to dispatch the focus event

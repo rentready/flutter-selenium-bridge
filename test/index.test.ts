@@ -23,88 +23,67 @@ describe('FlutterSeleniumBridge', () => {
         await driver.quit();
     });
 
-    test('should make the login button be found with enableAccessibility', async () => {
+    test('should make the App Main Screen be found with enableAccessibility', async () => {
         // Arrange
-        await driver.get("https://portal.rentready.com");
+        await driver.get("http://127.0.0.1:8000");
 
         // Act
         await bridge.enableAccessibility(60000);
 
         // Assert
-        const loginButtonXPath = '//flt-semantics[contains(@aria-label, "Login")]';
-        let loginButton;
-        try {
-            loginButton = await driver.wait(until.elementLocated(By.xpath(loginButtonXPath)), 30000);
-        } catch (error) {
-            // If the element is not found, the error will be caught here
-        }
+        const labelXPath = '//flt-semantics[contains(@aria-label, "App Main Screen")]';
+        let label = await driver.wait(until.elementLocated(By.xpath(labelXPath)), 30000);
 
-        // Assert that the login button is found
-        expect(loginButton).toBeDefined();
+        expect(label).toBeDefined();
     });
 
-    test('should make the login button clickable with enableAccessibility and display required messages', async () => {
+    test('should make the "Click Me" button clickable with enableAccessibility and display "You clicked me" message', async () => {
         // Arrange
-        await driver.get("https://portal.rentready.com");
+        await driver.get("http://127.0.0.1:8000");
 
         // Act
         await bridge.enableAccessibility(60000);
 
         // Assert
-        const loginButtonXPath = '//flt-semantics[contains(@aria-label, "Login")]';
-        let loginButton = await driver.wait(until.elementLocated(By.xpath(loginButtonXPath)), 30000);
+        const clickMeButtonXPath = '//flt-semantics[contains(@aria-label, "Click Me")]';
+        let clickMeButton = await driver.wait(until.elementLocated(By.xpath(clickMeButtonXPath)), 30000);
 
-        loginButton.click();
+        clickMeButton.click();
 
-        let emailRequiredElement;
-        let passwordRequiredElement;
-        try {
-            const passwordRequiredTextXPath = '//flt-semantics[contains(@aria-label, "Email Required")]';
-            passwordRequiredElement = await driver.wait(until.elementLocated(By.xpath(passwordRequiredTextXPath)), 30000);
-            const emailRequiredTextXPath = '//flt-semantics[contains(@aria-label, "Password Required")]';
-            emailRequiredElement = await driver.wait(until.elementLocated(By.xpath(emailRequiredTextXPath)), 30000);
-        } catch (error) {
-            // If the element is not found, the error will be caught here
-        }
+        const clickedMeLabelXPath = '//flt-semantics[contains(@aria-label, "You clicked me")]';
+        let clickedMeLabel = await driver.wait(until.elementLocated(By.xpath(clickedMeLabelXPath)), 30000);
 
-        // Assert that the "Password Required" text is found
-        expect(emailRequiredElement).toBeDefined();
-        expect(passwordRequiredElement).toBeDefined();
+        expect(clickedMeLabel).toBeDefined();
     });
 
-    test('should activate Flutter email input for value setting"', async () => {
+    test('should activate Flutter text input for value setting"', async () => {
         // Arrange
-        await driver.get("https://portal.rentready.com");
+        await driver.get("http://127.0.0.1:8000");
         await bridge.enableAccessibility(60000);
 
-        const emailInputXPath = '//flt-semantics[@id="flt-semantic-node-7"]/input';
+        const labelXPath = '//flt-semantics[contains(@aria-label, "App Main Screen")]';
+        await driver.wait(until.elementLocated(By.xpath(labelXPath)), 30000);
+
+        const nameInputXPath = '//flt-semantics[@id="flt-semantic-node-5"]/input';
 
         // Act
-        let emailInput = await bridge.activateInputField(By.xpath(emailInputXPath), 30000);
+        let nameInput = await bridge.activateInputField(By.xpath(nameInputXPath), 30000);
 
         // Assert
         // Verify that the input field can receive text input by sending keys
-        emailInput.sendKeys("netleon@ya.ru");
+        await nameInput.sendKeys("Daniel");
 
-        // Further assert that the email was properly set by attempting to proceed with login
-        // and checking for the absence of "Email Required" and presence of "Password Required" messages
+        // Further assert that the name was properly set by clicking "Say Hi" button
 
-        const loginButtonXPath = '//flt-semantics[contains(@aria-label, "Login")]';
-        let loginButton = await driver.wait(until.elementLocated(By.xpath(loginButtonXPath)), 30000);
-        loginButton.click();
+        const sayHiButtonXPath = '//flt-semantics[contains(@aria-label, "Say Hi")]';
+        let sayHiButton = await driver.wait(until.elementLocated(By.xpath(sayHiButtonXPath)), 30000);
 
-        let emailRequiredElement;
-        let passwordRequiredElement;
-        try {
-            const passwordRequiredTextXPath = '//flt-semantics[contains(@aria-label, "Password Required")]';
-            passwordRequiredElement = await driver.wait(until.elementLocated(By.xpath(passwordRequiredTextXPath)), 30000);
-            const emailRequiredTextXPath = '//flt-semantics[contains(@aria-label, "Email Required")]';
-            emailRequiredElement = await driver.wait(until.elementLocated(By.xpath(emailRequiredTextXPath)), 3000);
-        } catch (error) {
-            // If an element is not found, the error will be caught here
-        }
+        sayHiButton.click();
 
-        expect(emailRequiredElement).not.toBeDefined();
-        expect(passwordRequiredElement).toBeDefined();
+        // and checking for presence of "Hello, Daniel" message
+        const helloLabelXPath = '//flt-semantics[contains(@aria-label, "Hello, Daniel")]';
+        const helloLabel = await driver.wait(until.elementLocated(By.xpath(helloLabelXPath)), 30000);
+
+        expect(helloLabel).toBeDefined();
     });
 });
