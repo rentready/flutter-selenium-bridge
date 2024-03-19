@@ -12,42 +12,77 @@ While it does not aim to replace Flutter's own integration testing framework, it
 - **CanvasKit Renderer Compatibility:** Ensures that UI elements rendered as a single canvas by the CanvasKit renderer are made accessible for Selenium-based testing.
 - **Streamlined Testing Workflow:** Provides a simplified setup process, enabling developers to quickly begin writing and running Selenium tests on their Flutter applications.
 
-## Getting Started
-To get started with Flutter Selenium Bridge, follow these steps:
+## Installation
+To install Flutter Selenium Bridge, run the following command:
 
 1. **Install the package:**
    ```sh
-   npm install flutter-selenium-bridge
-   ```
-2. **Write your test cases:** Create a new directory called test in your project root and write your test cases using Selenium WebDriver API.
-3. ***Run your tests:*** Use the following command to execute your tests:
-   ```sh
-   npm test
+   npm install flutter-selenium-bridge --save-dev
    ```
 
-## Building the Package
-Before publishing, you may want to build the package to ensure that all TypeScript files are compiled to JavaScript:
+## Usage
+After installation, you can import FlutterSeleniumBridge in your test files and use it to interact with your Flutter Web application:
 
-1. **Compile TypeScript to JavaScript:**
-   ```sh
-   npm run build
+   ```javascript
+
+   const { FlutterSeleniumBridge } = require('flutter-selenium-bridge');
+   // Or, if using ES6 imports
+   import { FlutterSeleniumBridge } from 'flutter-selenium-bridge';
+
+   // Your test code here
    ```
-   This command will compile the TypeScript files in your src directory into JavaScript files in the dist directory.
 
-## Publishing the Package
-To publish the package to the NPM registry, follow these steps:
+### Enabling Accessibility
+To interact with UI components rendered by Flutter's CanvasKit renderer, you need to enable accessibility first. This allows Selenium to recognize and interact with the components as if they were standard HTML elements.
 
-### 1. Log in to NPM:
-   ```sh
-   npm login
-   ```
-   Enter your NPM username, password, and email address as prompted.
+```javascript
+const { Builder } = require('selenium-webdriver');
+const { FlutterSeleniumBridge } = require('flutter-selenium-bridge');
 
-### 2. Publish the package:
-   ```sh
-   npm publish
-   ```
-   This command will publish your package to the NPM registry. Make sure that the version number in your package.json is updated if you are publishing a new version.
+(async () => {
+
+  const driver = await new Builder()
+    .forBrowser('chrome')
+    .build();
+
+  const bridge = new FlutterSeleniumBridge(driver);
+  await driver.get('http://127.0.0.1:8000'); // Replace with your Flutter Web app URL
+  await bridge.enableAccessibility();
+})();
+```
+
+### Activating Input Fields
+If you need to set values in input fields within your Flutter Web application, use the activateInputField method before. This method ensures that the input field is ready to receive text input.
+
+```javascript
+
+
+(async () => {
+  // ... (after initializing driver and bridge, and navigating to your web app)
+  const nameInputXPath = '//flt-semantics[@id="flt-semantic-node-5"]/input';
+  const nameInput = await bridge.activateInputField(By.xpath(nameInputXPath));
+  await nameInput.sendKeys('Your Name');
+})();
+```
+
+### Interacting with Elements
+Once accessibility is enabled, you can interact with elements on the page using standard Selenium methods.
+
+```javascript
+(async () => {
+  // ... (after enabling accessibility)
+  const buttonXPath = '//flt-semantics[contains(@aria-label, "Click Me")]';
+  const clickMeButton = await driver.findElement(By.xpath(buttonXPath));
+  await clickMeButton.click();
+
+  // Verify that the expected response appears
+  const responseXPath = '//flt-semantics[contains(@aria-label, "You clicked me")]';
+  const responseLabel = await driver.findElement(By.xpath(responseXPath));
+  // ... (assertions or further interactions)
+})();
+```
+
+Remember to replace the XPath selectors with those that match the elements in your specific Flutter Web application.
 
 ## Ease of Adoption and Learning Curve
 Flutter Selenium Bridge allows QA engineers to adopt Selenium for creating UI tests without requiring in-depth knowledge of Flutter's internals. This package simplifies the process of enabling Selenium to work with Flutter Web applications, making it accessible for teams to implement automated UI testing for their deployed applications.
