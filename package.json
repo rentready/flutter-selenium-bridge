@@ -28,6 +28,9 @@
     "url": "https://github.com/rentready/flutter-selenium-bridge/issues"
   },
   "homepage": "https://github.com/rentready/flutter-selenium-bridge#readme",
+  "files": [
+    "dist/src/**/*"
+  ],
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/selenium-webdriver": "^4.1.22",
