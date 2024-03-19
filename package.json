@@ -1,5 +1,5 @@
 {
-  "name": "flutter-selenium-bridge",
+  "name": "@rentready/flutter-selenium-bridge",
   "version": "1.0.0",
   "description": "A tool to enable automated Selenium WebDriver testing for Flutter Web applications compiled with CanvasKit.",
   "main": "index.js",
