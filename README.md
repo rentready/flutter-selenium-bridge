@@ -7,10 +7,35 @@ This package specifically focuses on enabling Selenium WebDriver to interact wit
 
 While it does not aim to replace Flutter's own integration testing framework, it offers a complementary approach that is particularly useful for validating the deployed application in real-world scenarios.
 
+Flutter Selenium Bridge allows QA engineers to adopt Selenium for creating UI tests without requiring in-depth knowledge of Flutter's internals. This package simplifies the process of enabling Selenium to work with Flutter Web applications, making it accessible for teams to implement automated UI testing for their deployed applications.
+
 ## Key Features
 - **Selenium WebDriver Integration:** Facilitates the integration of Selenium WebDriver, allowing for automated browser testing of Flutter Web applications.
 - **CanvasKit Renderer Compatibility:** Ensures that UI elements rendered as a single canvas by the CanvasKit renderer are made accessible for Selenium-based testing.
 - **Streamlined Testing Workflow:** Provides a simplified setup process, enabling developers to quickly begin writing and running Selenium tests on their Flutter applications.
+
+## Manual Accessibility Activation
+
+The `enableAccessibility()` method provided by Flutter Selenium Bridge automates the process of making Flutter web elements accessible to Selenium by simulating a click on a hidden button that populates the DOM tree with semantic placeholders.
+
+To understand how this works and to aid in identifying the correct locators for your tests, it's important to know how to replicate this process manually:
+
+1. Open your Flutter web application in a browser.
+2. Open the Developer Tools (you can do this by right-clicking on the page and selecting "Inspect" or by pressing `Ctrl+Shift+I` on Windows/Linux or `Cmd+Option+I` on macOS).
+3. Go to the "Console" tab within the Developer Tools.
+4. Paste and execute the following script:
+   ```javascript
+   document.querySelector('flt-glass-pane').shadowRoot.querySelector('flt-semantics-placeholder').click();
+   ```
+
+This script clicks the hidden flt-semantics-placeholder button, which triggers the population of the DOM tree with UI elements, making them accessible for testing.
+
+![DOM Tree Expanded](dom-expanded.png)
+
+By performing this action manually, you can verify that the DOM tree of your Flutter web application is correctly populated. This is a crucial step for effectively using the Flutter Selenium Bridge package, as it ensures that you can find and interact with the Flutter elements during your testing.
+
+Once you have confirmed that you can manually populate the DOM tree and identify elements, you can proceed to use the automated enableAccessibility() method provided by the package in your test scripts.
+
 
 ## Installation
 To install Flutter Selenium Bridge, run the following command:
@@ -83,12 +108,6 @@ Once accessibility is enabled, you can interact with elements on the page using 
 ```
 
 Remember to replace the XPath selectors with those that match the elements in your specific Flutter Web application.
-
-## Ease of Adoption and Learning Curve
-Flutter Selenium Bridge allows QA engineers to adopt Selenium for creating UI tests without requiring in-depth knowledge of Flutter's internals. This package simplifies the process of enabling Selenium to work with Flutter Web applications, making it accessible for teams to implement automated UI testing for their deployed applications.
-
-## How It Works
-Flutter Selenium Bridge provides the necessary tools and instructions to enable accessibility within the Flutter Web application, allowing Selenium to recognize and interact with each UI component as if they were standard HTML elements. This is achieved by addressing the challenges posed by the CanvasKit renderer and ensuring that the UI elements are testable by Selenium.
 
 ## Contributing
 We welcome contributions to the Flutter Selenium Bridge project. If you have suggestions or improvements, please submit a pull request or open an issue on our [GitHub repository](https://github.com/rentready/flutter-selenium-bridge).

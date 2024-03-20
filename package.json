@@ -33,6 +33,7 @@
   "files": [
     "dist/src/index.js",
     "README.md",
+    "dom-expanded.md",
     "LICENSE"
   ],
   "peerDependencies": {
