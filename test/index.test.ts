@@ -98,7 +98,7 @@ describe('FlutterSeleniumBridge', () => {
         let nameInput = await bridge.activateInputField(By.xpath(nameInputXPath), 30000);
 
         // Assert
-        await assertThatInputActivated(nameInput);
+        await assertThatInputActivated(nameInput, "Say Hi");
     });
 
     test('should activate input within flt-semantics for value setting', async () => {
@@ -112,26 +112,40 @@ describe('FlutterSeleniumBridge', () => {
         let nameInput = await bridge.activateInputField(By.xpath(nameInputXPath), 30000);
 
         // Assert
-        await assertThatInputActivated(nameInput);
+        await assertThatInputActivated(nameInput, "Say Hi");
+    });
+
+    test('should activate input within flt-semantics and which has other elements for value setting', async () => {
+        // Arrange
+        await driver.get("http://127.0.0.1:8000");
+        await bridge.enableAccessibility(60000);
+
+        const passwordInputXPath = '//input[contains(@aria-label, "Password")]';
+
+        // Act
+        let passwordInput = await bridge.activateInputField(By.xpath(passwordInputXPath), 30000);
+
+        // Assert
+        await assertThatInputActivated(passwordInput, "Say Password");
     });
 
     // To assert that a field was activated, we send text, and assert that it is visible by Flutter logic
-    // That logic on button click changes the caption to "Hello, [Input Text]"
-    async function assertThatInputActivated(inputElement: WebElement): Promise<void> {
+    // That logic on button click changes the caption to contain the text "Daniel"
+    async function assertThatInputActivated(inputElement: WebElement, buttonLabel: string): Promise<void> {
 
         // Send the specified text to the input element
         await inputElement.sendKeys("Daniel");
     
         // Find and click the "Say Hi" button
-        const sayHiButtonXPath = '//flt-semantics[contains(@aria-label, "Say Hi")]';
-        let sayHiButton = await driver.wait(until.elementLocated(By.xpath(sayHiButtonXPath)), 30000);
-        await sayHiButton.click();
+        const buttonXPath = `//flt-semantics[contains(@aria-label, "${buttonLabel}")]`;
+        let buttonButton = await driver.wait(until.elementLocated(By.xpath(buttonXPath)), 30000);
+        await buttonButton.click();
     
         // Check for the presence of the expected "Hello, ..." message
-        const helloLabelXPath = `//flt-semantics[contains(@aria-label, "Hello, Daniel")]`;
-        const helloLabel = await driver.wait(until.elementLocated(By.xpath(helloLabelXPath)), 30000);
+        const labelXPath = `//flt-semantics[contains(@aria-label, "Daniel")]`;
+        const label = await driver.wait(until.elementLocated(By.xpath(labelXPath)), 30000);
     
         // Assert that the hello label is defined, indicating the input was activated and the text was set
-        expect(helloLabel).toBeDefined();
+        expect(label).toBeDefined();
     }
 });
