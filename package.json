@@ -7,6 +7,8 @@
     "build": "tsc",
     "start-sample-web-app": "http-server ./web-sample -p 8000",
     "test": "http-server ./web-sample -p 8000 & wait-on http://localhost:8000 && jest",
+    "start-flutter-app": "http-server ./web-sample -p 8000",
+    "kill-port-8000": "lsof -ti tcp:8000 | grep -q . && lsof -ti tcp:8000 | xargs kill || echo 'No process to kill on port 8000'",
     "prepublishOnly": "npm test && npm run build"
   },
   "repository": {

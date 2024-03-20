@@ -25,9 +25,9 @@ After installation, you can import FlutterSeleniumBridge in your test files and 
 
    ```javascript
 
-   const { FlutterSeleniumBridge } = require('flutter-selenium-bridge');
+   const { FlutterSeleniumBridge } = require('@rentready/flutter-selenium-bridge');
    // Or, if using ES6 imports
-   import { FlutterSeleniumBridge } from 'flutter-selenium-bridge';
+   import { FlutterSeleniumBridge } from '@rentready/flutter-selenium-bridge';
 
    // Your test code here
    ```
@@ -37,7 +37,7 @@ To interact with UI components rendered by Flutter's CanvasKit renderer, you nee
 
 ```javascript
 const { Builder } = require('selenium-webdriver');
-const { FlutterSeleniumBridge } = require('flutter-selenium-bridge');
+const { FlutterSeleniumBridge } = require('@rentready/flutter-selenium-bridge');
 
 (async () => {
 
