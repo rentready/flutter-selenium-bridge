@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/rentready/flutter-selenium-bridge#readme",
   "files": [
-    "dist/src/index.js",
+    "dist/**/*",
     "README.md",
     "dom-expanded.md",
     "LICENSE"
