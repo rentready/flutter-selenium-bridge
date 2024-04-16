@@ -68,9 +68,34 @@ export class FlutterSeleniumBridge {
             });
             textInput.dispatchEvent(focusEvent);
         `;
+
+        // Mimic click on a field's coordinates
+        const mimicClickAtInputCoordinates = `
+            const textInput = arguments[0];
+            // Dispatch a focus event manually
+            var rect = textInput.getBoundingClientRect();
+            var centerX = rect.left + rect.width / 2;
+            var centerY = rect.top + rect.height / 2;
+            
+            var clickEvent = new MouseEvent('click', {
+                bubbles: false,
+                cancelable: true,
+                view: window,
+                clientX: centerX,
+                clientY: centerY
+            });
+
+            textInput.dispatchEvent(clickEvent);
+        `;
     
         // Execute the script to dispatch the focus event
         await this.driver.executeScript(mimicFocusOnAnInput, element);
+    
+        // Introduce a delay
+        await this.driver.sleep(500);
+    
+        // Execute the script to dispatch the focus event
+        await this.driver.executeScript(mimicClickAtInputCoordinates, element);
     
         // Introduce a delay
         await this.driver.sleep(500);
