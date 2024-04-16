@@ -74,27 +74,7 @@ export class FlutterSeleniumBridge {
     
         // Introduce a delay
         await this.driver.sleep(500);
-
-        // Check if the parent flt-semantics element has pointer-events set to none
-        // That may happen, if the Flutter input has other child elements.
-        const parentElement = await element.findElement(By.xpath('parent::flt-semantics'));
-        let originalPointerEventsStyle = await parentElement.getCssValue('pointer-events');
-        if (originalPointerEventsStyle === 'none') {
-            // Temporarily set pointer-events to all
-            await this.driver.executeScript("arguments[0].style.pointerEvents='all'", parentElement);
-            await this.driver.sleep(100);
-        }
-
-        // Click the input element to activate it
-        await element.click();
-        await this.driver.sleep(100);
-
-        // Revert pointer-events style to its original state if it was changed
-        if (originalPointerEventsStyle === 'none') {
-            await this.driver.executeScript("arguments[0].style.pointerEvents='none'", parentElement);
-            await this.driver.sleep(100);
-        }
-
+        
         return element;
     }
 }
