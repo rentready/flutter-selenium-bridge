@@ -58,8 +58,8 @@ export class FlutterSeleniumBridge {
             throw new Error(`The located element is neither an input nor a flt-semantics element.`);
         }
         
-        // Combined script to mimic focus and click on a field's coordinates
-        const mimicFocusAndClick = `
+        // Combined script to mimic focus
+        const mimicFocus = `
             const textInput = arguments[0];
             // Dispatch a focus event manually
             const focusEvent = new FocusEvent('focus', {
@@ -67,28 +67,40 @@ export class FlutterSeleniumBridge {
                 cancelable: true
             });
             textInput.dispatchEvent(focusEvent);
-
-            // Dispatch a click event at the input's coordinates
-            var rect = textInput.getBoundingClientRect();
-            var centerX = rect.left + rect.width / 2;
-            var centerY = rect.top + rect.height / 2;
-            
-            var clickEvent = new MouseEvent('click', {
-                bubbles: false,
-                cancelable: true,
-                view: window,
-                clientX: centerX,
-                clientY: centerY
-            });
-
-            textInput.dispatchEvent(clickEvent);
         `;
 
         // Execute the combined script to dispatch the focus and click events
-        await this.driver.executeScript(mimicFocusAndClick, element);
+        await this.driver.executeScript(mimicFocus, element);
     
         // Introduce a delay
-        await this.driver.sleep(500);
+        await this.driver.sleep(100);
+
+        // Check if the parent flt-semantics element has pointer-events set to none
+        // That may happen, if the Flutter input has other child elements.
+        const parentElement = await element.findElement(By.xpath('parent::flt-semantics'));
+        let originalPointerEventsStyle = await parentElement.getCssValue('pointer-events');
+        if (originalPointerEventsStyle === 'none') {
+            // Temporarily set pointer-events to all
+            await this.driver.executeScript("arguments[0].style.pointerEvents='all'", parentElement);
+            await this.driver.sleep(100);
+        }
+
+        // Click the input element to activate it
+        await element.click();
+        await this.driver.sleep(100);
+
+        // Revert pointer-events style to its original state if it was changed
+        if (originalPointerEventsStyle === 'none') {
+            await this.driver.executeScript("arguments[0].style.pointerEvents='none'", parentElement);
+            await this.driver.sleep(100);
+        }
+
+        // Execute the combined script to dispatch the focus and click events
+        // For some cases the previous click could unfocus the input in Flutter version 3.19.5
+        await this.driver.executeScript(mimicFocus, element);
+    
+        // Introduce a delay
+        await this.driver.sleep(100);
         
         return element;
     }
