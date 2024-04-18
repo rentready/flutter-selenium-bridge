@@ -58,8 +58,8 @@ export class FlutterSeleniumBridge {
             throw new Error(`The located element is neither an input nor a flt-semantics element.`);
         }
         
-        // Mimic focus on a field
-        const mimicFocusOnAnInput = `
+        // Combined script to mimic focus
+        const mimicFocus = `
             const textInput = arguments[0];
             // Dispatch a focus event manually
             const focusEvent = new FocusEvent('focus', {
@@ -68,9 +68,9 @@ export class FlutterSeleniumBridge {
             });
             textInput.dispatchEvent(focusEvent);
         `;
-    
-        // Execute the script to dispatch the focus event
-        await this.driver.executeScript(mimicFocusOnAnInput, element);
+
+        // Execute the combined script to dispatch the focus and click events
+        await this.driver.executeScript(mimicFocus, element);
     
         // Introduce a delay
         await this.driver.sleep(500);

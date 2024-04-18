@@ -23,10 +23,13 @@ describe('FlutterSeleniumBridge', () => {
         await driver.quit();
     });
 
+    beforeEach(async () => {
+        const port = '8080';
+        await driver.get(`http://127.0.0.1:${port}`);
+    });
+
     test('should make the App Main Screen be found with enableAccessibility', async () => {
         // Arrange
-        await driver.get("http://127.0.0.1:8000");
-
         // Act
         await bridge.enableAccessibility(60000);
 
@@ -39,8 +42,6 @@ describe('FlutterSeleniumBridge', () => {
 
     test('should make the "Click Me" button clickable with enableAccessibility and display "You clicked me" message', async () => {
         // Arrange
-        await driver.get("http://127.0.0.1:8000");
-
         // Act
         await bridge.enableAccessibility(60000);
 
@@ -58,7 +59,6 @@ describe('FlutterSeleniumBridge', () => {
 
     test('should throw an error if element is neither input nor flt-semantics', async () => {
         // Arrange
-        await driver.get("http://127.0.0.1:8000");
         await bridge.enableAccessibility(60000);
     
         // This XPath should locate an element that is neither an input nor a flt-semantics
@@ -72,7 +72,6 @@ describe('FlutterSeleniumBridge', () => {
 
     test('should throw an error if no input element found', async () => {
         // Arrange
-        await driver.get("http://127.0.0.1:8000");
         await bridge.enableAccessibility(60000);
     
         // This XPath should locate an element that is neither an input nor a flt-semantics
@@ -86,7 +85,6 @@ describe('FlutterSeleniumBridge', () => {
 
     test('should activate direct input for value setting', async () => {
         // Arrange
-        await driver.get("http://127.0.0.1:8000");
         await bridge.enableAccessibility(60000);
 
         const labelXPath = '//flt-semantics[contains(@aria-label, "App Main Screen")]';
@@ -103,7 +101,6 @@ describe('FlutterSeleniumBridge', () => {
 
     test('should activate input within flt-semantics for value setting', async () => {
         // Arrange
-        await driver.get("http://127.0.0.1:8000");
         await bridge.enableAccessibility(60000);
 
         const nameInputXPath = '//flt-semantics[@id="flt-semantic-node-5"]';
@@ -117,7 +114,6 @@ describe('FlutterSeleniumBridge', () => {
 
     test('should activate input within flt-semantics and which has other elements for value setting', async () => {
         // Arrange
-        await driver.get("http://127.0.0.1:8000");
         await bridge.enableAccessibility(60000);
 
         const passwordInputXPath = '//input[contains(@aria-label, "Password")]';
