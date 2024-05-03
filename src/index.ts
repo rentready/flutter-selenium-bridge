@@ -41,36 +41,33 @@ export class FlutterSeleniumBridge {
 
     public async activateInputField(locator: Locator, timeout: number = 30000): Promise<WebElement> {
         let element = await this.driver.wait(until.elementLocated(locator), timeout);
-    
-        // Check the tag name of the located element
+
         const tagName = await element.getTagName();
     
         // If the element is a flt-semantics, find the first child input
         if (tagName.toLowerCase() === 'flt-semantics') {
-            const inputChildren = await element.findElements(By.css('input'));
+            const inputChildren = await element.findElements(By.css('input, textarea'));
             if (inputChildren.length === 0) {
-                // If no input children are found under flt-semantics, fail the method
-                throw new Error(`No input element found as a child of flt-semantics.`);
+                throw new Error(`No input or textarea element found as a child of flt-semantics.`);
             }
-            element = inputChildren[0]; // Assuming we want the first input child    
-        } else if (tagName.toLowerCase() !== 'input') {
-            // If the element is neither an input nor a flt-semantics, fail the method
-            throw new Error(`The located element is neither an input nor a flt-semantics element.`);
+            element = inputChildren[0]; // Assuming we want the first input or textarea child    
+        } else if (tagName.toLowerCase() !== 'input' && tagName.toLowerCase() !== 'textarea') {
+            throw new Error(`The located element is neither an input, a textarea, nor a flt-semantics element.`);
         }
         
-        // Combined script to mimic focus
-        const mimicFocus = `
-            const textInput = arguments[0];
-            // Dispatch a focus event manually
-            const focusEvent = new FocusEvent('focus', {
-                bubbles: false, // Focus events do not bubble
-                cancelable: true
-            });
-            textInput.dispatchEvent(focusEvent);
-        `;
-
-        // Execute the combined script to dispatch the focus and click events
-        await this.driver.executeScript(mimicFocus, element);
+        if (tagName.toLowerCase() === 'input') {
+            const mimicFocus = `
+                const textInput = arguments[0];
+                // Dispatch a focus event manually
+                const focusEvent = new FocusEvent('focus', {
+                    bubbles: false, // Focus events do not bubble
+                    cancelable: true
+                });
+                textInput.dispatchEvent(focusEvent);
+            `;
+    
+            await this.driver.executeScript(mimicFocus, element);
+        }
     
         // Introduce a delay
         await this.driver.sleep(500);

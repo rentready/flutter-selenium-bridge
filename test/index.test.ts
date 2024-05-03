@@ -67,7 +67,7 @@ describe('FlutterSeleniumBridge', () => {
         // Act and Assert
         await expect(bridge.activateInputField(By.xpath(nonInputXPath), 1000))
             .rejects
-            .toThrow('The located element is neither an input nor a flt-semantics element.');
+            .toThrow('The located element is neither an input, a textarea, nor a flt-semantics element.');
     });
 
     test('should throw an error if no input element found', async () => {
@@ -80,7 +80,7 @@ describe('FlutterSeleniumBridge', () => {
         // Act and Assert
         await expect(bridge.activateInputField(By.xpath(nonInputXPath), 5000))
             .rejects
-            .toThrow('No input element found as a child of flt-semantics.');
+            .toThrow('No input or textarea element found as a child of flt-semantics.');
     });
 
     test('should activate direct input for value setting', async () => {
@@ -99,11 +99,27 @@ describe('FlutterSeleniumBridge', () => {
         await assertThatInputActivated(nameInput, "Say Hi");
     });
 
+    test('should activate direct textarea for value setting', async () => {
+        // Arrange
+        await bridge.enableAccessibility(60000);
+
+        const labelXPath = '//flt-semantics[contains(@aria-label, "App Main Screen")]';
+        await driver.wait(until.elementLocated(By.xpath(labelXPath)), 30000);
+
+        const multilineInputXPath = '//textarea[contains(@aria-label, "Multiline text field")]';
+
+        // Act
+        let multilineInput = await bridge.activateInputField(By.xpath(multilineInputXPath), 30000);
+
+        // Assert
+        await assertThatInputActivated(multilineInput, "Check what entered");
+    });
+
     test('should activate input within flt-semantics for value setting', async () => {
         // Arrange
         await bridge.enableAccessibility(60000);
 
-        const nameInputXPath = '//flt-semantics[@id="flt-semantic-node-5"]';
+        const nameInputXPath = '//flt-semantics[@id="flt-semantic-node-7"]';
 
         // Act
         let nameInput = await bridge.activateInputField(By.xpath(nameInputXPath), 30000);
