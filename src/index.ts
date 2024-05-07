@@ -55,7 +55,7 @@ export class FlutterSeleniumBridge {
             throw new Error(`The located element is neither an input, a textarea, nor a flt-semantics element.`);
         }
         
-        if (tagName.toLowerCase() === 'input') {
+        if ((await element.getTagName()).toLowerCase() === 'input') {
             const mimicFocus = `
                 const textInput = arguments[0];
                 // Dispatch a focus event manually
